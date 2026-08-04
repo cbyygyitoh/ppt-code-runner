@@ -1,0 +1,659 @@
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+import os
+
+# 获取桌面路径
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+output_path = os.path.join(desktop_path, "data_world_for_kids.pptx")
+
+# 创建演示文稿
+prs = Presentation()
+prs.slide_width = Inches(13.333)
+prs.slide_height = Inches(7.5)
+
+# ==================== 颜色定义 ====================
+COLORS = {
+    'sky_blue': RGBColor(135, 206, 235),
+    'sunny_yellow': RGBColor(255, 215, 0),
+    'grass_green': RGBColor(144, 238, 144),
+    'pink': RGBColor(255, 182, 193),
+    'orange': RGBColor(255, 165, 0),
+    'purple': RGBColor(186, 85, 211),
+    'white': RGBColor(255, 255, 255),
+    'dark': RGBColor(50, 50, 80),
+    'red': RGBColor(255, 69, 0),
+    'light_blue': RGBColor(173, 216, 230),
+    'light_pink': RGBColor(255, 228, 225),
+    'light_green': RGBColor(152, 251, 152),
+    'gold': RGBColor(255, 215, 0),
+}
+
+def add_star(slide, left, top, size, color):
+    """添加星星装饰 - 使用5角星"""
+    try:
+        star = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.STAR_5, left, top, size, size)
+        star.fill.solid()
+        star.fill.fore_color.rgb = color
+        star.line.fill.background()
+    except:
+        # 如果星星不可用，用圆形替代
+        star = slide.shapes.add_shape(MSO_SHAPE.OVAL, left, top, size, size)
+        star.fill.solid()
+        star.fill.fore_color.rgb = color
+        star.line.fill.background()
+    return star
+
+def add_cloud(slide, left, top, width, height, color):
+    """添加云朵装饰"""
+    try:
+        cloud = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.CLOUD, left, top, width, height)
+        cloud.fill.solid()
+        cloud.fill.fore_color.rgb = color
+        cloud.line.fill.background()
+    except:
+        # 如果云朵不可用，用圆角矩形替代
+        cloud = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
+        cloud.fill.solid()
+        cloud.fill.fore_color.rgb = color
+        cloud.line.fill.background()
+    return cloud
+
+def add_smile_face(slide, left, top, size, color):
+    """添加笑脸"""
+    # 圆形脸
+    face = slide.shapes.add_shape(MSO_SHAPE.OVAL, left, top, size, size)
+    face.fill.solid()
+    face.fill.fore_color.rgb = color
+    face.line.fill.background()
+    
+    # 眼睛（两个小圆）
+    eye1 = slide.shapes.add_shape(MSO_SHAPE.OVAL, left + size*0.2, top + size*0.25, size*0.12, size*0.15)
+    eye1.fill.solid()
+    eye1.fill.fore_color.rgb = RGBColor(50, 50, 50)
+    eye1.line.fill.background()
+    
+    eye2 = slide.shapes.add_shape(MSO_SHAPE.OVAL, left + size*0.68, top + size*0.25, size*0.12, size*0.15)
+    eye2.fill.solid()
+    eye2.fill.fore_color.rgb = RGBColor(50, 50, 50)
+    eye2.line.fill.background()
+    
+    # 嘴巴（弧形）
+    mouth = slide.shapes.add_shape(MSO_SHAPE.ARC, left + size*0.25, top + size*0.45, size*0.5, size*0.35)
+    mouth.fill.solid()
+    mouth.fill.fore_color.rgb = RGBColor(200, 50, 50)
+    mouth.line.fill.background()
+    return face
+
+# ==================== 第1页：封面 ====================
+slide1 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg_colors = [RGBColor(255, 200, 200), RGBColor(255, 230, 200), RGBColor(255, 255, 200), 
+             RGBColor(200, 255, 200), RGBColor(200, 230, 255), RGBColor(230, 200, 255)]
+for i in range(6):
+    bar = slide1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(i * 1.25), 
+                                  Inches(13.333), Inches(1.25))
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = bg_colors[i]
+    bar.line.fill.background()
+
+for i in range(8):
+    x = Inches(0.5 + i * 1.7)
+    y = Inches(0.3 + (i % 3) * 0.4)
+    size = Inches(0.3 + (i % 3) * 0.1)
+    colors = [COLORS['gold'], COLORS['pink'], COLORS['sky_blue'], COLORS['orange']]
+    add_star(slide1, x, y, size, colors[i % 4])
+
+title_box = slide1.shapes.add_textbox(Inches(0), Inches(2.0), Inches(13.333), Inches(1.5))
+tf = title_box.text_frame
+tf.text = "🚀 探索奇妙的数据世界"
+p = tf.paragraphs[0]
+p.font.size = Pt(56)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+sub_box = slide1.shapes.add_textbox(Inches(0), Inches(3.8), Inches(13.333), Inches(0.8))
+tf = sub_box.text_frame
+tf.text = "🌟 和小伙伴一起，发现数据的秘密！"
+p = tf.paragraphs[0]
+p.font.size = Pt(32)
+p.font.color.rgb = RGBColor(100, 50, 150)
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+add_smile_face(slide1, Inches(5.5), Inches(4.8), Inches(1.2), COLORS['sunny_yellow'])
+
+footer = slide1.shapes.add_textbox(Inches(0), Inches(6.5), Inches(13.333), Inches(0.4))
+tf = footer.text_frame
+tf.text = "🎈 数据小达人 · 三年级专场 🎈"
+p = tf.paragraphs[0]
+p.font.size = Pt(18)
+p.font.color.rgb = RGBColor(100, 100, 150)
+p.font.name = 'Arial'
+p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第2页：什么是数据？ ====================
+slide2 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg2 = slide2.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg2.fill.solid()
+bg2.fill.fore_color.rgb = COLORS['light_blue']
+bg2.line.fill.background()
+
+add_cloud(slide2, Inches(0.5), Inches(0.2), Inches(2), Inches(1), RGBColor(255, 255, 255))
+add_cloud(slide2, Inches(10), Inches(0.5), Inches(2.5), Inches(1.2), RGBColor(255, 255, 255))
+
+title2 = slide2.shapes.add_textbox(Inches(0), Inches(0.8), Inches(13.333), Inches(0.8))
+tf = title2.text_frame
+tf.text = "🤔 什么是数据？"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+cards = [
+    ("📊 数字", "年龄、身高、体重\n考试成绩、人数", RGBColor(255, 150, 150)),
+    ("📝 文字", "名字、地址\n喜欢什么、做什么", RGBColor(150, 200, 255)),
+    ("🎨 图片", "照片、图画\n表情符号、图标", RGBColor(150, 255, 150)),
+    ("🎵 声音", "音乐、说话声\n大自然的声响", RGBColor(255, 200, 150)),
+]
+
+for i, (title, desc, color) in enumerate(cards):
+    x = 1.0 + i * 2.8
+    y = 2.2
+    
+    card = slide2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.5), Inches(2.8))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    card.line.color.rgb = color
+    card.line.width = Pt(3)
+    
+    ct = slide2.shapes.add_textbox(Inches(x+0.2), Inches(y+0.2), Inches(2.1), Inches(0.6))
+    tf = ct.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(24)
+    p.font.color.rgb = color
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    cd = slide2.shapes.add_textbox(Inches(x+0.2), Inches(y+0.9), Inches(2.1), Inches(1.6))
+    tf = cd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(16)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+tip = slide2.shapes.add_textbox(Inches(0), Inches(6.0), Inches(13.333), Inches(0.5))
+tf = tip.text_frame
+tf.text = "💡 小提示：数据就像我们身边的小精灵，无处不在哦！"
+p = tf.paragraphs[0]
+p.font.size = Pt(20)
+p.font.color.rgb = RGBColor(200, 50, 100)
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第3页：数据从哪里来？ ====================
+slide3 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg3 = slide3.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg3.fill.solid()
+bg3.fill.fore_color.rgb = COLORS['light_green']
+bg3.line.fill.background()
+
+title3 = slide3.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title3.text_frame
+tf.text = "🔍 数据从哪里来？"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+sources = [
+    ("👀 观察", "用眼睛看\n用耳朵听\n用手触摸", RGBColor(255, 200, 100)),
+    ("📱 设备", "手机、电脑\n相机、手表\n各种传感器", RGBColor(100, 200, 255)),
+    ("📚 书本", "课本、故事书\n百科全书\n作业本", RGBColor(255, 150, 200)),
+    ("🗣️ 交流", "和小伙伴聊天\n问老师问题\n和家人分享", RGBColor(150, 255, 200)),
+]
+
+for i, (title, desc, color) in enumerate(sources):
+    x = 1.0 + i * 2.8
+    y = 2.0
+    
+    circle = slide3.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x+0.5), Inches(y), Inches(1.5), Inches(1.5))
+    circle.fill.solid()
+    circle.fill.fore_color.rgb = color
+    circle.line.fill.background()
+    
+    icon = slide3.shapes.add_textbox(Inches(x+0.5), Inches(y+0.2), Inches(1.5), Inches(1.1))
+    tf = icon.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(48)
+    p.font.color.rgb = RGBColor(255, 255, 255)
+    p.font.name = 'Segoe UI Emoji'
+    p.alignment = PP_ALIGN.CENTER
+    
+    sd = slide3.shapes.add_textbox(Inches(x), Inches(y+1.8), Inches(2.5), Inches(1.2))
+    tf = sd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(16)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第4页：数据有什么用？ ====================
+slide4 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg4 = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg4.fill.solid()
+bg4.fill.fore_color.rgb = COLORS['light_pink']
+bg4.line.fill.background()
+
+title4 = slide4.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title4.text_frame
+tf.text = "✨ 数据有什么用？"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+uses = [
+    ("📈 帮助做决定", "选什么零食？\n今天穿什么？\n去哪儿玩？", RGBColor(255, 150, 150)),
+    ("🎯 发现规律", "什么时候放学？\n最喜欢的游戏？\n谁跑得最快？", RGBColor(150, 200, 255)),
+    ("💡 解决问题", "怎么排队最公平？\n怎么分零食？\n怎么整理书包？", RGBColor(150, 255, 150)),
+    ("🌟 预测未来", "明天会下雨吗？\n考试成绩预测？\n运动会谁会赢？", RGBColor(255, 200, 150)),
+]
+
+for i, (title, desc, color) in enumerate(uses):
+    x = 0.8 + i * 3.0
+    y = 2.0
+    
+    card = slide4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.8), Inches(3.2))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    card.line.color.rgb = color
+    card.line.width = Pt(4)
+    
+    ct = slide4.shapes.add_textbox(Inches(x+0.3), Inches(y+0.3), Inches(2.2), Inches(0.5))
+    tf = ct.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(22)
+    p.font.color.rgb = color
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    cd = slide4.shapes.add_textbox(Inches(x+0.3), Inches(y+1.0), Inches(2.2), Inches(1.8))
+    tf = cd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(18)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第5页：数据的分类 ====================
+slide5 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg5 = slide5.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg5.fill.solid()
+bg5.fill.fore_color.rgb = RGBColor(255, 228, 196)
+bg5.line.fill.background()
+
+title5 = slide5.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title5.text_frame
+tf.text = "📊 数据大分类"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+categories = [
+    ("📊 数值数据", "1, 2, 3, 4, 5...\n10, 20, 30...\n可以加减乘除", RGBColor(255, 150, 100), RGBColor(255, 200, 150)),
+    ("🏷️ 分类数据", "苹果、香蕉、橘子\n红色、蓝色、绿色\n猫、狗、兔子", RGBColor(100, 200, 255), RGBColor(200, 230, 255)),
+    ("📅 时间数据", "周一、周二...\n1月、2月...\n上午、下午", RGBColor(150, 255, 150), RGBColor(200, 255, 200)),
+    ("📍 位置数据", "教室、操场、家\n北京、上海、广州\n上面、下面、旁边", RGBColor(255, 200, 255), RGBColor(255, 230, 255)),
+]
+
+for i, (title, desc, color1, color2) in enumerate(categories):
+    x = 0.8 + i * 2.9
+    y = 2.0
+    
+    card_bg = slide5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.7), Inches(3.5))
+    card_bg.fill.solid()
+    card_bg.fill.fore_color.rgb = color2
+    card_bg.line.color.rgb = color1
+    card_bg.line.width = Pt(3)
+    
+    top_bar = slide5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.7), Inches(0.6))
+    top_bar.fill.solid()
+    top_bar.fill.fore_color.rgb = color1
+    top_bar.line.fill.background()
+    
+    ct = slide5.shapes.add_textbox(Inches(x+0.2), Inches(y+0.08), Inches(2.3), Inches(0.5))
+    tf = ct.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(20)
+    p.font.color.rgb = RGBColor(255, 255, 255)
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    cd = slide5.shapes.add_textbox(Inches(x+0.3), Inches(y+0.8), Inches(2.1), Inches(2.2))
+    tf = cd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(18)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第6页：生活中的数据 ====================
+slide6 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg6 = slide6.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg6.fill.solid()
+bg6.fill.fore_color.rgb = RGBColor(200, 230, 255)
+bg6.line.fill.background()
+
+title6 = slide6.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title6.text_frame
+tf.text = "🏠 生活中的数据"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+scenes = [
+    ("🌡️ 天气", "今天多少度？\n什么时候下雨？\n风有多大？", RGBColor(255, 200, 100), "🌤️"),
+    ("🍭 零食", "有多少颗糖？\n哪种最受欢迎？\n谁吃得最多？", RGBColor(255, 150, 200), "🍬"),
+    ("📚 学习", "考了多少分？\n看了几本书？\n写了多少字？", RGBColor(100, 200, 255), "📖"),
+    ("🎮 游戏", "赢了还是输了？\n得了多少分？\n玩了多久？", RGBColor(150, 255, 150), "🎯"),
+]
+
+for i, (title, desc, color, emoji) in enumerate(scenes):
+    x = 0.8 + i * 2.9
+    y = 2.0
+    
+    card = slide6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.7), Inches(3.2))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    card.line.color.rgb = color
+    card.line.width = Pt(4)
+    
+    emoji_box = slide6.shapes.add_textbox(Inches(x+0.8), Inches(y+0.2), Inches(1.1), Inches(0.8))
+    tf = emoji_box.text_frame
+    tf.text = emoji
+    p = tf.paragraphs[0]
+    p.font.size = Pt(48)
+    p.font.name = 'Segoe UI Emoji'
+    p.alignment = PP_ALIGN.CENTER
+    
+    ct = slide6.shapes.add_textbox(Inches(x+0.2), Inches(y+1.0), Inches(2.3), Inches(0.4))
+    tf = ct.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(20)
+    p.font.color.rgb = color
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    cd = slide6.shapes.add_textbox(Inches(x+0.3), Inches(y+1.5), Inches(2.1), Inches(1.4))
+    tf = cd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(16)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第7页：小游戏 ====================
+slide7 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg7 = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg7.fill.solid()
+bg7.fill.fore_color.rgb = COLORS['sunny_yellow']
+bg7.line.fill.background()
+
+title7 = slide7.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title7.text_frame
+tf.text = "🎮 小游戏：找找数据在哪里？"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+question = slide7.shapes.add_textbox(Inches(0), Inches(1.6), Inches(13.333), Inches(0.6))
+tf = question.text_frame
+tf.text = '👀 下面哪些是"数据"呢？'
+p = tf.paragraphs[0]
+p.font.size = Pt(30)
+p.font.color.rgb = RGBColor(200, 50, 50)
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+options = [
+    ("📊 身高140cm", True, RGBColor(100, 200, 100)),
+    ("🎵 一首好听的歌", False, RGBColor(255, 150, 150)),
+    ("📝 名字叫小明", True, RGBColor(100, 200, 100)),
+    ("🎨 一幅美丽的画", False, RGBColor(255, 150, 150)),
+    ("📈 考试得了95分", True, RGBColor(100, 200, 100)),
+    ("🌈 彩虹的颜色", False, RGBColor(255, 150, 150)),
+]
+
+for i, (text, is_data, color) in enumerate(options):
+    x = 1.5 + (i % 3) * 3.5
+    y = 2.8 + (i // 3) * 1.8
+    
+    box = slide7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(3.0), Inches(1.2))
+    box.fill.solid()
+    box.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    box.line.color.rgb = color
+    box.line.width = Pt(3)
+    
+    opt_text = slide7.shapes.add_textbox(Inches(x+0.3), Inches(y+0.2), Inches(2.4), Inches(0.8))
+    tf = opt_text.text_frame
+    tf.text = text
+    p = tf.paragraphs[0]
+    p.font.size = Pt(20)
+    p.font.color.rgb = COLORS['dark']
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+answer = slide7.shapes.add_textbox(Inches(0), Inches(6.2), Inches(13.333), Inches(0.5))
+tf = answer.text_frame
+tf.text = "💡 小提示：能数、能算、能记录的才是数据哦！"
+p = tf.paragraphs[0]
+p.font.size = Pt(22)
+p.font.color.rgb = RGBColor(100, 50, 150)
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第8页：数据怎么整理 ====================
+slide8 = prs.slides.add_slide(prs.slide_layouts[6])
+
+bg8 = slide8.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg8.fill.solid()
+bg8.fill.fore_color.rgb = RGBColor(200, 255, 200)
+bg8.line.fill.background()
+
+title8 = slide8.shapes.add_textbox(Inches(0), Inches(0.5), Inches(13.333), Inches(0.8))
+tf = title8.text_frame
+tf.text = "🧹 数据整理小技巧"
+p = tf.paragraphs[0]
+p.font.size = Pt(44)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+methods = [
+    ("📋 列表", "把数据一个一个\n排好队，列出来", RGBColor(100, 200, 255)),
+    ("📊 表格", "用表格把数据\n分分类，排整齐", RGBColor(255, 200, 100)),
+    ("📈 图表", "用柱状图、饼图\n画出来，更好看", RGBColor(255, 150, 200)),
+    ("🗂️ 分类", "把相同类型的\n数据放在一起", RGBColor(150, 255, 150)),
+]
+
+for i, (title, desc, color) in enumerate(methods):
+    x = 1.5 + i * 2.6
+    y = 2.0
+    
+    card = slide8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(2.4), Inches(3.0))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+    card.line.color.rgb = color
+    card.line.width = Pt(4)
+    
+    num = slide8.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x+0.8), Inches(y-0.3), Inches(0.8), Inches(0.8))
+    num.fill.solid()
+    num.fill.fore_color.rgb = color
+    num.line.fill.background()
+    
+    num_text = slide8.shapes.add_textbox(Inches(x+0.8), Inches(y-0.25), Inches(0.8), Inches(0.7))
+    tf = num_text.text_frame
+    tf.text = str(i+1)
+    p = tf.paragraphs[0]
+    p.font.size = Pt(28)
+    p.font.color.rgb = RGBColor(255, 255, 255)
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    ct = slide8.shapes.add_textbox(Inches(x+0.2), Inches(y+0.6), Inches(2.0), Inches(0.4))
+    tf = ct.text_frame
+    tf.text = title
+    p = tf.paragraphs[0]
+    p.font.size = Pt(20)
+    p.font.color.rgb = color
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+    
+    cd = slide8.shapes.add_textbox(Inches(x+0.2), Inches(y+1.1), Inches(2.0), Inches(1.4))
+    tf = cd.text_frame
+    tf.text = desc
+    p = tf.paragraphs[0]
+    p.font.size = Pt(16)
+    p.font.color.rgb = COLORS['dark']
+    p.font.name = 'Comic Sans MS'
+    p.alignment = PP_ALIGN.CENTER
+
+# ==================== 第9页：总结 ====================
+slide9 = prs.slides.add_slide(prs.slide_layouts[6])
+
+for i in range(8):
+    bar = slide9.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(i * 0.94), 
+                                  Inches(13.333), Inches(0.94))
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = bg_colors[i % 6]
+    bar.line.fill.background()
+
+title9 = slide9.shapes.add_textbox(Inches(0), Inches(1.2), Inches(13.333), Inches(1.0))
+tf = title9.text_frame
+tf.text = "🎉 今天学到了什么？"
+p = tf.paragraphs[0]
+p.font.size = Pt(48)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+knowledge = [
+    ("✅ 什么是数据", "✅ 数据从哪里来"),
+    ("✅ 数据有什么用", "✅ 数据怎么分类"),
+    ("✅ 生活中的数据", "✅ 数据整理方法"),
+]
+
+for i, (k1, k2) in enumerate(knowledge):
+    y = 2.8 + i * 1.2
+    
+    k1_box = slide9.shapes.add_textbox(Inches(1.5), Inches(y), Inches(4.5), Inches(0.6))
+    tf = k1_box.text_frame
+    tf.text = k1
+    p = tf.paragraphs[0]
+    p.font.size = Pt(24)
+    p.font.color.rgb = RGBColor(50, 100, 200)
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+    
+    k2_box = slide9.shapes.add_textbox(Inches(7.0), Inches(y), Inches(4.5), Inches(0.6))
+    tf = k2_box.text_frame
+    tf.text = k2
+    p = tf.paragraphs[0]
+    p.font.size = Pt(24)
+    p.font.color.rgb = RGBColor(50, 100, 200)
+    p.font.bold = True
+    p.font.name = 'Comic Sans MS'
+
+# ==================== 第10页：再见页 ====================
+slide10 = prs.slides.add_slide(prs.slide_layouts[6])
+
+for i in range(8):
+    bar = slide10.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(i * 0.94), 
+                                   Inches(13.333), Inches(0.94))
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = bg_colors[i % 6]
+    bar.line.fill.background()
+
+bye_title = slide10.shapes.add_textbox(Inches(0), Inches(2.0), Inches(13.333), Inches(1.2))
+tf = bye_title.text_frame
+tf.text = "👋 再见啦，小数据达人！"
+p = tf.paragraphs[0]
+p.font.size = Pt(56)
+p.font.color.rgb = COLORS['dark']
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+bye_sub = slide10.shapes.add_textbox(Inches(0), Inches(3.5), Inches(13.333), Inches(0.6))
+tf = bye_sub.text_frame
+tf.text = "🌟 继续发现生活中的数据奥秘吧！"
+p = tf.paragraphs[0]
+p.font.size = Pt(32)
+p.font.color.rgb = RGBColor(100, 50, 150)
+p.font.bold = True
+p.font.name = 'Comic Sans MS'
+p.alignment = PP_ALIGN.CENTER
+
+add_smile_face(slide10, Inches(5.5), Inches(4.8), Inches(1.5), COLORS['sunny_yellow'])
+
+# ==================== 保存文件到桌面 ====================
+prs.save(output_path)
+
+print("=" * 60)
+print("🎉 PPT 已成功生成！")
+print(f"📁 保存位置: {output_path}")
+print(f"📊 共 {len(prs.slides)} 页幻灯片")
+print("🎨 专为小学生设计的可爱风格PPT")
+print("🌟 包含: 封面、教学内容、小游戏、总结、结束页")
+print("=" * 60)

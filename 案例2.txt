@@ -1,0 +1,410 @@
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+import os
+
+# 创建演示文稿对象
+prs = Presentation()
+prs.slide_width = Inches(13.333)
+prs.slide_height = Inches(7.5)
+
+# ==================== 辅助函数 ====================
+def set_text_properties(text_frame, font_size, font_color, bold=False, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE):
+    """设置文本框的字体、对齐等属性"""
+    text_frame.paragraphs[0].alignment = align
+    text_frame.paragraphs[0].font.size = Pt(font_size)
+    text_frame.paragraphs[0].font.color.rgb = font_color
+    text_frame.paragraphs[0].font.bold = bold
+    text_frame.vertical_anchor = valign
+
+def add_text_box(slide, left, top, width, height, text, font_size, font_color, bold=False, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE):
+    """添加文本框并设置属性"""
+    txBox = slide.shapes.add_textbox(left, top, width, height)
+    tf = txBox.text_frame
+    tf.text = text
+    set_text_properties(tf, font_size, font_color, bold, align, valign)
+    return txBox
+
+def add_rounded_rect(slide, left, top, width, height, fill_color, line_color=None, line_width=0):
+    """添加圆角矩形"""
+    shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
+    shape.fill.solid()
+    shape.fill.fore_color.rgb = fill_color
+    if line_color:
+        shape.line.color.rgb = line_color
+        shape.line.width = line_width
+    else:
+        shape.line.fill.background()
+    return shape
+
+# ==================== 颜色定义 ====================
+COLOR_DARK_BLUE = RGBColor(0, 30, 60)
+COLOR_LIGHT_BLUE = RGBColor(0, 120, 212)
+COLOR_ACCENT = RGBColor(255, 180, 0)
+COLOR_WHITE = RGBColor(255, 255, 255)
+COLOR_GRAY = RGBColor(200, 200, 200)
+COLOR_LIGHT_GRAY = RGBColor(240, 240, 240)
+COLOR_GREEN = RGBColor(0, 180, 100)
+COLOR_ORANGE = RGBColor(255, 120, 0)
+COLOR_PURPLE = RGBColor(120, 50, 200)
+
+# ==================== 第1页：封面 ====================
+slide1 = prs.slides.add_slide(prs.slide_layouts[6])  # 空白布局
+
+# 背景：渐变效果使用深蓝色块 + 装饰圆
+bg_rect = slide1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
+bg_rect.fill.solid()
+bg_rect.fill.fore_color.rgb = COLOR_DARK_BLUE
+bg_rect.line.fill.background()
+
+# 装饰性圆环
+circle1 = slide1.shapes.add_shape(MSO_SHAPE.OVAL, Inches(9), Inches(-1), Inches(5), Inches(5))
+circle1.fill.solid()
+circle1.fill.fore_color.rgb = RGBColor(0, 60, 120)
+circle1.line.fill.background()
+
+circle2 = slide1.shapes.add_shape(MSO_SHAPE.OVAL, Inches(-2), Inches(4), Inches(4), Inches(4))
+circle2.fill.solid()
+circle2.fill.fore_color.rgb = RGBColor(0, 80, 160)
+circle2.line.fill.background()
+
+# 主标题
+title_box = slide1.shapes.add_textbox(Inches(1), Inches(1.5), Inches(11.3), Inches(1.5))
+tf = title_box.text_frame
+tf.text = "人工智能发展"
+tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+tf.paragraphs[0].font.size = Pt(60)
+tf.paragraphs[0].font.color.rgb = COLOR_WHITE
+tf.paragraphs[0].font.bold = True
+
+# 副标题
+sub_box = slide1.shapes.add_textbox(Inches(1), Inches(3.2), Inches(11.3), Inches(1))
+tf = sub_box.text_frame
+tf.text = "从科幻到现实的智慧革命"
+tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+tf.paragraphs[0].font.size = Pt(28)
+tf.paragraphs[0].font.color.rgb = COLOR_GRAY
+
+# 装饰线
+line = slide1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(4), Inches(4.3), Inches(5.3), Inches(0.08))
+line.fill.solid()
+line.fill.fore_color.rgb = COLOR_ACCENT
+line.line.fill.background()
+
+# 日期 / 作者信息
+info_box = slide1.shapes.add_textbox(Inches(1), Inches(6), Inches(11.3), Inches(0.6))
+tf = info_box.text_frame
+tf.text = "2026年8月  ·  人工智能专题"
+tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+tf.paragraphs[0].font.size = Pt(18)
+tf.paragraphs[0].font.color.rgb = RGBColor(180, 180, 180)
+
+# ==================== 第2页：目录 ====================
+slide2 = prs.slides.add_slide(prs.slide_layouts[6])
+
+# 标题
+add_text_box(slide2, Inches(0.8), Inches(0.5), Inches(11.7), Inches(1), 
+             "目录", 44, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+
+# 装饰下划线
+line2 = slide2.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.5), Inches(2), Inches(0.08))
+line2.fill.solid()
+line2.fill.fore_color.rgb = COLOR_ACCENT
+line2.line.fill.background()
+
+# 目录项 - 使用圆角矩形 + 文字
+items = [
+    ("01", "人工智能的起源与定义", "从图灵测试到学科建立"),
+    ("02", "发展历程：三次浪潮", "跌宕起伏的60年"),
+    ("03", "核心技术突破", "深度学习与大数据"),
+    ("04", "当代应用场景", "AI无处不在"),
+    ("05", "未来趋势与挑战", "机遇与责任并存"),
+]
+
+y_start = 2.3
+for idx, (num, title, desc) in enumerate(items):
+    y = y_start + idx * 0.9
+    # 数字圆
+    circle = slide2.shapes.add_shape(MSO_SHAPE.OVAL, Inches(1.2), Inches(y), Inches(0.6), Inches(0.6))
+    circle.fill.solid()
+    circle.fill.fore_color.rgb = COLOR_LIGHT_BLUE
+    circle.line.fill.background()
+    num_box = slide2.shapes.add_textbox(Inches(1.2), Inches(y), Inches(0.6), Inches(0.6))
+    tf = num_box.text_frame
+    tf.text = num
+    tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+    tf.paragraphs[0].font.size = Pt(16)
+    tf.paragraphs[0].font.color.rgb = COLOR_WHITE
+    tf.paragraphs[0].font.bold = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+
+    # 标题
+    add_text_box(slide2, Inches(2.1), Inches(y+0.05), Inches(4), Inches(0.5), 
+                 title, 22, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+    # 描述
+    add_text_box(slide2, Inches(2.1), Inches(y+0.5), Inches(5), Inches(0.4), 
+                 desc, 16, RGBColor(100, 100, 100), align=PP_ALIGN.LEFT)
+
+# 右侧装饰图 - 简单线条网络
+for i in range(6):
+    x = Inches(8.5) + i * Inches(0.5)
+    y = Inches(2.5) + i * Inches(0.5)
+    dot = slide2.shapes.add_shape(MSO_SHAPE.OVAL, x, y, Inches(0.12), Inches(0.12))
+    dot.fill.solid()
+    dot.fill.fore_color.rgb = COLOR_LIGHT_BLUE
+    dot.line.fill.background()
+
+# ==================== 第3页：起源与定义 ====================
+slide3 = prs.slides.add_slide(prs.slide_layouts[6])
+
+# 左半部分背景
+bg_left = slide3.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(6.6), prs.slide_height)
+bg_left.fill.solid()
+bg_left.fill.fore_color.rgb = COLOR_DARK_BLUE
+bg_left.line.fill.background()
+
+# 左标题
+add_text_box(slide3, Inches(0.8), Inches(1), Inches(5), Inches(1.2), 
+             "01 起源与定义", 40, COLOR_WHITE, bold=True, align=PP_ALIGN.LEFT)
+
+# 左内容
+left_text = "人工智能（AI）是一门研究、开发用于模拟、延伸和扩展人类智能的理论与技术学科。\n\n1956年达特茅斯会议正式提出“人工智能”一词，标志着AI作为独立学科的诞生。"
+add_text_box(slide3, Inches(0.8), Inches(2.5), Inches(5), Inches(2.5), 
+             left_text, 20, RGBColor(200, 220, 255), align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.TOP)
+
+# 右侧图灵测试卡片
+card_bg = slide3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(7.2), Inches(1.2), Inches(5.2), Inches(2.8))
+card_bg.fill.solid()
+card_bg.fill.fore_color.rgb = COLOR_WHITE
+card_bg.line.color.rgb = COLOR_LIGHT_BLUE
+card_bg.line.width = Pt(2)
+
+add_text_box(slide3, Inches(7.2), Inches(1.5), Inches(5.2), Inches(0.6), 
+             "🔍 图灵测试", 24, COLOR_DARK_BLUE, bold=True)
+add_text_box(slide3, Inches(7.5), Inches(2.2), Inches(4.6), Inches(1.6), 
+             "如果一台机器能够与人类展开对话而不被辨别出机器身份，那么这台机器就具有智能。", 
+             18, RGBColor(80, 80, 80), align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.TOP)
+
+# 第二个卡片
+card_bg2 = slide3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(7.2), Inches(4.5), Inches(5.2), Inches(2.2))
+card_bg2.fill.solid()
+card_bg2.fill.fore_color.rgb = RGBColor(245, 248, 255)
+card_bg2.line.color.rgb = RGBColor(200, 215, 240)
+card_bg2.line.width = Pt(1)
+
+add_text_box(slide3, Inches(7.5), Inches(4.8), Inches(4.6), Inches(1.6), 
+             "🤖 智能的核心能力：学习 · 推理 · 感知 · 语言理解", 
+             18, COLOR_DARK_BLUE, align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.TOP)
+
+# ==================== 第4页：发展历程 ====================
+slide4 = prs.slides.add_slide(prs.slide_layouts[6])
+
+add_text_box(slide4, Inches(0.8), Inches(0.5), Inches(11.7), Inches(1), 
+             "02 发展历程：三次浪潮", 44, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+line4 = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.5), Inches(2.2), Inches(0.08))
+line4.fill.solid()
+line4.fill.fore_color.rgb = COLOR_ACCENT
+line4.line.fill.background()
+
+# 时间线 - 用三个圆角矩形
+waves = [
+    ("第一次浪潮\n1956-1974", "符号主义与推理", "逻辑推理、专家系统\n初步实现智能行为", COLOR_LIGHT_BLUE),
+    ("第二次浪潮\n1980-1987", "专家系统与知识工程", "知识库 + 推理引擎\n商业化尝试", COLOR_GREEN),
+    ("第三次浪潮\n2006-至今", "深度学习与大数据", "神经网络 + 海量数据\n生成式AI爆发", COLOR_ORANGE),
+]
+
+x_positions = [1.5, 5.3, 9.1]
+for i, (title, sub, desc, color) in enumerate(waves):
+    x = Inches(x_positions[i])
+    # 卡片
+    card = slide4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, Inches(2.5), Inches(3.2), Inches(3.8))
+    card.fill.solid()
+    card.fill.fore_color.rgb = COLOR_WHITE
+    card.line.color.rgb = color
+    card.line.width = Pt(3)
+    
+    # 年份标签
+    tag = slide4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x+Inches(0.4), Inches(2.2), Inches(2.4), Inches(0.6))
+    tag.fill.solid()
+    tag.fill.fore_color.rgb = color
+    tag.line.fill.background()
+    add_text_box(slide4, x+Inches(0.4), Inches(2.2), Inches(2.4), Inches(0.6), 
+                 title.split('\n')[0], 16, COLOR_WHITE, bold=True)
+    
+    # 标题
+    add_text_box(slide4, x+Inches(0.2), Inches(3.0), Inches(2.8), Inches(0.8), 
+                 title.split('\n')[1] if '\n' in title else title, 22, COLOR_DARK_BLUE, bold=True)
+    # 副标题
+    add_text_box(slide4, x+Inches(0.2), Inches(3.8), Inches(2.8), Inches(0.5), 
+                 sub, 18, RGBColor(80, 80, 80), align=PP_ALIGN.CENTER)
+    # 描述
+    add_text_box(slide4, x+Inches(0.2), Inches(4.4), Inches(2.8), Inches(1.5), 
+                 desc, 16, RGBColor(120, 120, 120), align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.TOP)
+
+# 连接箭头 - 使用线条
+for i in range(2):
+    x1 = Inches(x_positions[i] + 3.4)
+    x2 = Inches(x_positions[i+1] - 0.2)
+    line_arrow = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, x1, Inches(4.2), x2-x1, Inches(0.06))
+    line_arrow.fill.solid()
+    line_arrow.fill.fore_color.rgb = RGBColor(180, 180, 180)
+    line_arrow.line.fill.background()
+
+# ==================== 第5页：核心技术 ====================
+slide5 = prs.slides.add_slide(prs.slide_layouts[6])
+
+# 深色背景条
+top_bar = slide5.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, Inches(1.8))
+top_bar.fill.solid()
+top_bar.fill.fore_color.rgb = COLOR_DARK_BLUE
+top_bar.line.fill.background()
+
+add_text_box(slide5, Inches(0.8), Inches(0.3), Inches(11.7), Inches(1), 
+             "03 核心技术突破", 44, COLOR_WHITE, bold=True, align=PP_ALIGN.LEFT)
+
+# 四个技术卡片
+techs = [
+    ("🧠 深度学习", "多层神经网络模拟人脑，从数据中自动学习特征表示。", COLOR_LIGHT_BLUE),
+    ("📊 大数据", "海量高质量数据是AI训练的基础燃料。", COLOR_GREEN),
+    ("⚡ 算力提升", "GPU/TPU等硬件加速，使复杂模型训练成为可能。", COLOR_ORANGE),
+    ("🔗 自然语言处理", "Transformer架构驱动了GPT等生成式模型的发展。", COLOR_PURPLE),
+]
+
+positions = [(0.8, 2.5, 5.5, 1.8), (7.0, 2.5, 5.5, 1.8), (0.8, 4.8, 5.5, 1.8), (7.0, 4.8, 5.5, 1.8)]
+for i, (title, desc, color) in enumerate(techs):
+    l, t, w, h = positions[i]
+    card = slide5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(l), Inches(t), Inches(w), Inches(h))
+    card.fill.solid()
+    card.fill.fore_color.rgb = COLOR_WHITE
+    card.line.color.rgb = color
+    card.line.width = Pt(2)
+    
+    add_text_box(slide5, Inches(l+0.2), Inches(t+0.1), Inches(w-0.4), Inches(0.6), 
+                 title, 22, color, bold=True, align=PP_ALIGN.LEFT)
+    add_text_box(slide5, Inches(l+0.2), Inches(t+0.7), Inches(w-0.4), Inches(1), 
+                 desc, 16, RGBColor(80, 80, 80), align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.TOP)
+
+# ==================== 第6页：应用场景 ====================
+slide6 = prs.slides.add_slide(prs.slide_layouts[6])
+
+add_text_box(slide6, Inches(0.8), Inches(0.5), Inches(11.7), Inches(1), 
+             "04 当代应用场景", 44, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+line6 = slide6.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.5), Inches(2.4), Inches(0.08))
+line6.fill.solid()
+line6.fill.fore_color.rgb = COLOR_ACCENT
+line6.line.fill.background()
+
+# 应用图标网格
+apps = [
+    ("🏥 医疗", "影像诊断 · 药物研发", RGBColor(0, 150, 200)),
+    ("🚗 交通", "自动驾驶 · 智慧交通", RGBColor(0, 180, 100)),
+    ("🏦 金融", "风险控制 · 智能投顾", RGBColor(255, 160, 0)),
+    ("🎓 教育", "个性化学习 · 智能辅导", RGBColor(200, 80, 200)),
+    ("🎬 娱乐", "内容生成 · 推荐系统", RGBColor(230, 50, 50)),
+    ("🏭 制造", "质量检测 · 预测维护", RGBColor(0, 120, 200)),
+]
+
+x_start = 1.2
+y_start = 2.3
+for idx, (name, desc, color) in enumerate(apps):
+    row = idx // 3
+    col = idx % 3
+    x = x_start + col * 3.8
+    y = y_start + row * 2.0
+    card = slide6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(3.2), Inches(1.5))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(248, 250, 255)
+    card.line.color.rgb = color
+    card.line.width = Pt(2)
+    
+    add_text_box(slide6, Inches(x+0.1), Inches(y+0.1), Inches(3.0), Inches(0.6), 
+                 name, 22, color, bold=True, align=PP_ALIGN.CENTER)
+    add_text_box(slide6, Inches(x+0.1), Inches(y+0.7), Inches(3.0), Inches(0.6), 
+                 desc, 15, RGBColor(100, 100, 100), align=PP_ALIGN.CENTER)
+
+# ==================== 第7页：未来与挑战 ====================
+slide7 = prs.slides.add_slide(prs.slide_layouts[6])
+
+# 双栏布局
+# 左栏 - 未来趋势
+left_bg = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(6.6), prs.slide_height)
+left_bg.fill.solid()
+left_bg.fill.fore_color.rgb = RGBColor(245, 248, 255)
+left_bg.line.fill.background()
+
+add_text_box(slide7, Inches(0.8), Inches(0.8), Inches(5), Inches(1), 
+             "🚀 未来趋势", 36, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+
+trends = [
+    "• 通用人工智能（AGI）的探索",
+    "• 多模态大模型融合",
+    "• 边缘AI与端侧智能",
+    "• AI与生物科技交叉",
+]
+for i, t in enumerate(trends):
+    add_text_box(slide7, Inches(0.8), Inches(2.0 + i*0.6), Inches(5.2), Inches(0.6), 
+                 t, 20, COLOR_DARK_BLUE, align=PP_ALIGN.LEFT)
+
+# 右栏 - 挑战
+right_bg = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(6.6), 0, Inches(6.7), prs.slide_height)
+right_bg.fill.solid()
+right_bg.fill.fore_color.rgb = RGBColor(255, 250, 240)
+right_bg.line.fill.background()
+
+add_text_box(slide7, Inches(7.0), Inches(0.8), Inches(5.5), Inches(1), 
+             "⚠️ 核心挑战", 36, COLOR_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+
+challenges = [
+    "• 数据隐私与安全",
+    "• 算法偏见与公平性",
+    "• 可解释性与透明度",
+    "• 就业结构调整",
+]
+for i, c in enumerate(challenges):
+    add_text_box(slide7, Inches(7.0), Inches(2.0 + i*0.6), Inches(5.5), Inches(0.6), 
+                 c, 20, COLOR_DARK_BLUE, align=PP_ALIGN.LEFT)
+
+# ==================== 第8页：总结 ====================
+slide8 = prs.slides.add_slide(prs.slide_layouts[6])
+
+# 全屏深色背景
+bg_full = slide8.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
+bg_full.fill.solid()
+bg_full.fill.fore_color.rgb = COLOR_DARK_BLUE
+bg_full.line.fill.background()
+
+# 装饰圆
+deco1 = slide8.shapes.add_shape(MSO_SHAPE.OVAL, Inches(10), Inches(-1), Inches(4), Inches(4))
+deco1.fill.solid()
+deco1.fill.fore_color.rgb = RGBColor(0, 60, 120)
+deco1.line.fill.background()
+
+deco2 = slide8.shapes.add_shape(MSO_SHAPE.OVAL, Inches(-1), Inches(5), Inches(3), Inches(3))
+deco2.fill.solid()
+deco2.fill.fore_color.rgb = RGBColor(0, 80, 150)
+deco2.line.fill.background()
+
+add_text_box(slide8, Inches(0.8), Inches(1.2), Inches(11.7), Inches(1.5), 
+             "人工智能正在重塑世界", 52, COLOR_WHITE, bold=True)
+
+add_text_box(slide8, Inches(0.8), Inches(3.0), Inches(11.7), Inches(1), 
+             "以技术为引擎，以责任为舵，驶向智能未来", 28, COLOR_GRAY)
+
+# 金色装饰线
+line_end = slide8.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(3.5), Inches(4.3), Inches(6.3), Inches(0.08))
+line_end.fill.solid()
+line_end.fill.fore_color.rgb = COLOR_ACCENT
+line_end.line.fill.background()
+
+add_text_box(slide8, Inches(0.8), Inches(6), Inches(11.7), Inches(0.8), 
+             "感谢聆听", 36, RGBColor(180, 200, 255), bold=True)
+
+# ==================== 保存文件 ====================
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+file_path = os.path.join(desktop_path, "人工智能发展_PPT.pptx")
+prs.save(file_path)
+
+print(f"✅ PPT已成功生成并保存至：{file_path}")
+print("🎨 设计风格：深蓝主题 + 金色点缀，清晰的信息层级与视觉吸引力。")

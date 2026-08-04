@@ -1,0 +1,492 @@
+from pptx import Presentation
+from pptx.util import Inches, Pt, Emu
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+import os
+
+# 创建演示文稿
+prs = Presentation()
+prs.slide_width = Inches(13.333)
+prs.slide_height = Inches(7.5)
+
+# ========== 辅助函数 ==========
+def add_bg(slide, color):
+    bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
+    bg.fill.solid()
+    bg.fill.fore_color.rgb = color
+    bg.line.fill.background()
+
+def add_text(slide, text, left, top, width, height, font_size=24, color=RGBColor(0,0,0), align=PP_ALIGN.CENTER, bold=False, italic=False):
+    box = slide.shapes.add_textbox(left, top, width, height)
+    tf = box.text_frame
+    tf.text = text
+    tf.paragraphs[0].alignment = align
+    tf.paragraphs[0].font.size = Pt(font_size)
+    tf.paragraphs[0].font.color.rgb = color
+    tf.paragraphs[0].font.bold = bold
+    tf.paragraphs[0].font.italic = italic
+    return box
+
+def add_deco_circle(slide, x, y, size, color):
+    circle = slide.shapes.add_shape(MSO_SHAPE.OVAL, x, y, size, size)
+    circle.fill.solid()
+    circle.fill.fore_color.rgb = color
+    circle.line.fill.background()
+    return circle
+
+def add_deco_line(slide, x, y, width, height, color):
+    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, width, height)
+    line.fill.solid()
+    line.fill.fore_color.rgb = color
+    line.line.fill.background()
+    return line
+
+def add_star(slide, x, y, size, color):
+    star = slide.shapes.add_shape(MSO_SHAPE.STAR_5_POINT, x, y, size, size)
+    star.fill.solid()
+    star.fill.fore_color.rgb = color
+    star.line.fill.background()
+    return star
+
+# ========== 颜色定义 ==========
+C_ORANGE = RGBColor(255, 180, 80)
+C_DARK_ORANGE = RGBColor(200, 100, 30)
+C_PINK = RGBColor(255, 200, 210)
+C_BLUE = RGBColor(180, 220, 240)
+C_DARK_BLUE = RGBColor(30, 100, 160)
+C_GREEN = RGBColor(180, 230, 170)
+C_DARK_GREEN = RGBColor(50, 140, 60)
+C_PURPLE = RGBColor(210, 190, 240)
+C_DARK_PURPLE = RGBColor(120, 70, 180)
+C_YELLOW = RGBColor(255, 230, 130)
+C_WHITE = RGBColor(255, 255, 255)
+C_BLACK = RGBColor(30, 30, 30)
+C_GRAY = RGBColor(150, 150, 150)
+C_WARM = RGBColor(255, 235, 210)
+C_MINT = RGBColor(200, 240, 220)
+C_LAVENDER = RGBColor(235, 225, 250)
+
+# ============================================================
+# 幻灯片1：封面
+# ============================================================
+slide1 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide1, C_WARM)
+
+# 背景装饰圆
+add_deco_circle(slide1, Inches(10.5), Inches(-0.5), Inches(4.5), RGBColor(255, 200, 130))
+add_deco_circle(slide1, Inches(-1), Inches(5), Inches(3.5), RGBColor(255, 215, 160))
+add_deco_circle(slide1, Inches(11.5), Inches(5.5), Inches(2), RGBColor(255, 190, 100))
+
+# 装饰小圆点
+for i in range(8):
+    add_deco_circle(slide1, Inches(0.8 + i * 1.6), Inches(6.8), Inches(0.08), C_DARK_ORANGE)
+
+# 顶部装饰线
+add_deco_line(slide1, Inches(0), Inches(0.6), prs.slide_width, Inches(0.03), C_DARK_ORANGE)
+add_deco_line(slide1, Inches(0), Inches(0.65), prs.slide_width, Inches(0.02), C_ORANGE)
+
+# 主标题 - 阴影效果
+title_shadow = slide1.shapes.add_textbox(Inches(1.55), Inches(2.25), Inches(10), Inches(1.5))
+tf = title_shadow.text_frame
+tf.text = "《放学路上》"
+tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+tf.paragraphs[0].font.size = Pt(70)
+tf.paragraphs[0].font.color.rgb = RGBColor(180, 130, 80)
+tf.paragraphs[0].font.bold = True
+
+title_main = slide1.shapes.add_textbox(Inches(1.5), Inches(2.2), Inches(10), Inches(1.5))
+tf = title_main.text_frame
+tf.text = "《放学路上》"
+tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+tf.paragraphs[0].font.size = Pt(70)
+tf.paragraphs[0].font.color.rgb = C_DARK_ORANGE
+tf.paragraphs[0].font.bold = True
+
+# 副标题
+sub_bg = slide1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(3.5), Inches(3.9), Inches(6.3), Inches(0.8))
+sub_bg.fill.solid()
+sub_bg.fill.fore_color.rgb = C_ORANGE
+sub_bg.line.fill.background()
+
+add_text(slide1, "✦ 一段温暖的心灵旅程 ✦", Inches(3.5), Inches(3.85), Inches(6.3), Inches(0.9), 
+         font_size=26, color=C_WHITE, bold=True)
+
+add_text(slide1, "制作：你的名字  |  2026年8月  |  🏫 放学记忆", 
+         Inches(1.5), Inches(5.8), Inches(10), Inches(0.6), 
+         font_size=18, color=RGBColor(120, 80, 50), align=PP_ALIGN.CENTER)
+
+add_star(slide1, Inches(0.8), Inches(1.2), Inches(0.4), C_ORANGE)
+add_star(slide1, Inches(12), Inches(0.8), Inches(0.5), C_ORANGE)
+add_star(slide1, Inches(12.3), Inches(6.2), Inches(0.35), C_ORANGE)
+
+# ============================================================
+# 幻灯片2：目录
+# ============================================================
+slide2 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide2, C_BLUE)
+
+add_deco_circle(slide2, Inches(11.5), Inches(0.5), Inches(2.5), RGBColor(150, 200, 230))
+add_deco_circle(slide2, Inches(-0.5), Inches(5.5), Inches(2), RGBColor(130, 190, 220))
+add_deco_circle(slide2, Inches(6), Inches(6.5), Inches(1), RGBColor(160, 210, 240))
+
+add_text(slide2, "📖 目 录", Inches(1), Inches(0.4), Inches(11), Inches(1.2), 
+         font_size=50, color=C_DARK_BLUE, bold=True, align=PP_ALIGN.CENTER)
+
+add_deco_line(slide2, Inches(4.5), Inches(1.6), Inches(4.3), Inches(0.04), C_DARK_BLUE)
+
+items = [
+    ("01", "放学铃声响起", "🔔"),
+    ("02", "路上的风景", "🌳"),
+    ("03", "遇见的人和事", "👋"),
+    ("04", "内心的感悟", "💭"),
+    ("05", "回家的路", "🏠")
+]
+
+y_start = 2.0
+for i, (num, title, icon) in enumerate(items):
+    y = y_start + i * 0.85
+    circle = slide2.shapes.add_shape(MSO_SHAPE.OVAL, Inches(2.8), Inches(y-0.05), Inches(0.55), Inches(0.55))
+    circle.fill.solid()
+    circle.fill.fore_color.rgb = C_DARK_BLUE
+    circle.line.fill.background()
+    add_text(slide2, num, Inches(2.8), Inches(y-0.1), Inches(0.55), Inches(0.6), 
+             font_size=18, color=C_WHITE, bold=True)
+    add_text(slide2, f"{icon}  {title}", Inches(3.6), Inches(y-0.05), Inches(6), Inches(0.6), 
+             font_size=28, color=C_BLACK, align=PP_ALIGN.LEFT, bold=True)
+    if i < len(items)-1:
+        add_deco_line(slide2, Inches(3.05), Inches(y+0.4), Inches(0.04), Inches(0.45), C_DARK_BLUE)
+
+# ============================================================
+# 幻灯片3：放学铃声响起
+# ============================================================
+slide3 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide3, C_PINK)
+
+add_deco_circle(slide3, Inches(10.5), Inches(0.2), Inches(3), RGBColor(255, 170, 190))
+add_deco_circle(slide3, Inches(0.5), Inches(5.5), Inches(2.5), RGBColor(255, 190, 210))
+add_deco_circle(slide3, Inches(12), Inches(5), Inches(1.5), RGBColor(255, 160, 180))
+
+add_text(slide3, "🔔  01  放学铃声响起", Inches(1), Inches(0.4), Inches(11), Inches(1.1), 
+         font_size=42, color=RGBColor(180, 50, 80), bold=True, align=PP_ALIGN.LEFT)
+
+add_deco_line(slide3, Inches(1), Inches(1.5), Inches(4.5), Inches(0.04), RGBColor(200, 80, 110))
+
+quote_l = slide3.shapes.add_textbox(Inches(1.2), Inches(1.8), Inches(0.6), Inches(0.8))
+tf = quote_l.text_frame
+tf.text = "「"
+tf.paragraphs[0].font.size = Pt(60)
+tf.paragraphs[0].font.color.rgb = RGBColor(200, 80, 110)
+tf.paragraphs[0].font.bold = True
+
+content3 = """“叮铃铃——”
+
+一天的课程终于结束，
+教室瞬间沸腾起来。
+
+收拾书包，走出校门，
+一天中最自由的时光开始了。"""
+
+add_text(slide3, content3, Inches(1.8), Inches(1.8), Inches(8), Inches(3.5), 
+         font_size=26, color=C_BLACK, align=PP_ALIGN.LEFT)
+
+quote_r = slide3.shapes.add_textbox(Inches(9.2), Inches(4.5), Inches(0.6), Inches(0.8))
+tf = quote_r.text_frame
+tf.text = "」"
+tf.paragraphs[0].font.size = Pt(60)
+tf.paragraphs[0].font.color.rgb = RGBColor(200, 80, 110)
+tf.paragraphs[0].font.bold = True
+
+# 铃铛装饰
+bell = slide3.shapes.add_shape(MSO_SHAPE.OVAL, Inches(10.2), Inches(2.5), Inches(1.2), Inches(1.5))
+bell.fill.solid()
+bell.fill.fore_color.rgb = RGBColor(200, 160, 50)
+bell.line.color.rgb = RGBColor(150, 110, 30)
+bell.line.width = Pt(2)
+
+bell_top = slide3.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(10.5), Inches(2.2), Inches(0.6), Inches(0.3))
+bell_top.fill.solid()
+bell_top.fill.fore_color.rgb = RGBColor(200, 160, 50)
+bell_top.line.fill.background()
+
+add_text(slide3, "⏰", Inches(10.3), Inches(2.8), Inches(1), Inches(0.8), font_size=40)
+
+# ============================================================
+# 幻灯片4：路上的风景
+# ============================================================
+slide4 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide4, C_MINT)
+
+add_deco_circle(slide4, Inches(-0.8), Inches(-0.5), Inches(3), RGBColor(150, 220, 180))
+add_deco_circle(slide4, Inches(11.5), Inches(5.5), Inches(2.5), RGBColor(130, 210, 170))
+add_deco_circle(slide4, Inches(6), Inches(6.8), Inches(1.2), RGBColor(170, 230, 190))
+
+add_text(slide4, "🌳  02  路上的风景", Inches(1), Inches(0.4), Inches(11), Inches(1.1), 
+         font_size=42, color=C_DARK_GREEN, bold=True, align=PP_ALIGN.LEFT)
+add_deco_line(slide4, Inches(1), Inches(1.5), Inches(4.2), Inches(0.04), C_DARK_GREEN)
+
+# 风景卡片
+card = slide4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.2), Inches(1.8), Inches(4.8), Inches(4.2))
+card.fill.solid()
+card.fill.fore_color.rgb = C_WHITE
+card.line.color.rgb = C_DARK_GREEN
+card.line.width = Pt(2)
+
+# 太阳
+sun = slide4.shapes.add_shape(MSO_SHAPE.OVAL, Inches(2.8), Inches(2.2), Inches(0.8), Inches(0.8))
+sun.fill.solid()
+sun.fill.fore_color.rgb = RGBColor(255, 200, 50)
+sun.line.fill.background()
+
+# 树1
+tree_trunk = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(3.5), Inches(4.2), Inches(0.3), Inches(1.2))
+tree_trunk.fill.solid()
+tree_trunk.fill.fore_color.rgb = RGBColor(120, 80, 40)
+tree_trunk.line.fill.background()
+
+tree_top = slide4.shapes.add_shape(MSO_SHAPE.OVAL, Inches(3.0), Inches(3.2), Inches(1.3), Inches(1.2))
+tree_top.fill.solid()
+tree_top.fill.fore_color.rgb = RGBColor(60, 160, 60)
+tree_top.line.fill.background()
+
+# 树2
+tree2_trunk = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(4.8), Inches(4.3), Inches(0.25), Inches(1.0))
+tree2_trunk.fill.solid()
+tree2_trunk.fill.fore_color.rgb = RGBColor(100, 70, 30)
+tree2_trunk.line.fill.background()
+
+tree2_top = slide4.shapes.add_shape(MSO_SHAPE.OVAL, Inches(4.4), Inches(3.5), Inches(1.0), Inches(1.0))
+tree2_top.fill.solid()
+tree2_top.fill.fore_color.rgb = RGBColor(50, 150, 50)
+tree2_top.line.fill.background()
+
+# 小路
+road = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(2.5), Inches(5.2), Inches(2.2), Inches(0.4))
+road.fill.solid()
+road.fill.fore_color.rgb = RGBColor(200, 180, 150)
+road.line.fill.background()
+
+add_text(slide4, "🌅 放学路上的林荫道", Inches(1.5), Inches(5.6), Inches(4.2), Inches(0.5), 
+         font_size=18, color=C_BLACK, align=PP_ALIGN.CENTER, italic=True)
+
+desc4 = """夕阳把影子拉得很长，
+路边的梧桐叶沙沙作响。
+
+小卖部的香味飘散开来，
+一切都那么熟悉而美好。
+
+天空从湛蓝变成橘红，
+像一幅流动的水彩画。"""
+
+add_text(slide4, desc4, Inches(6.8), Inches(2.0), Inches(5.5), Inches(4), 
+         font_size=24, color=C_BLACK, align=PP_ALIGN.LEFT)
+
+add_star(slide4, Inches(11.8), Inches(1.2), Inches(0.3), RGBColor(200, 180, 50))
+add_star(slide4, Inches(12.3), Inches(4.5), Inches(0.25), RGBColor(200, 180, 50))
+
+# ============================================================
+# 幻灯片5：遇见的人和事
+# ============================================================
+slide5 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide5, C_LAVENDER)
+
+add_deco_circle(slide5, Inches(11.8), Inches(0.2), Inches(2.2), RGBColor(190, 170, 220))
+add_deco_circle(slide5, Inches(-0.5), Inches(6), Inches(2), RGBColor(180, 160, 210))
+add_deco_circle(slide5, Inches(6), Inches(0), Inches(1.5), RGBColor(200, 180, 230))
+
+add_text(slide5, "👋  03  遇见的人和事", Inches(1), Inches(0.4), Inches(11), Inches(1.1), 
+         font_size=42, color=C_DARK_PURPLE, bold=True, align=PP_ALIGN.LEFT)
+add_deco_line(slide5, Inches(1), Inches(1.5), Inches(4.8), Inches(0.04), C_DARK_PURPLE)
+
+cards = [
+    ("👴 卖红薯的老爷爷", "每天准时出现在路口\n笑容温暖 红薯香甜\n是放学路上最暖的守候"),
+    ("🐕 遛狗的大姐", "那只金毛总是冲我摇尾巴\n仿佛在说：放学快乐！\n一天的疲惫都被治愈"),
+    ("👦 同路的小伙伴", "一起分享零食\n讨论作业和梦想\n友谊在脚步中生长")
+]
+
+y_cards = 1.9
+for i, (title, desc) in enumerate(cards):
+    x = 1.2 + i * 3.9
+    card = slide5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y_cards), Inches(3.4), Inches(3.8))
+    card.fill.solid()
+    card.fill.fore_color.rgb = C_WHITE
+    card.line.color.rgb = C_DARK_PURPLE
+    card.line.width = Pt(2)
+    
+    bar = slide5.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y_cards), Inches(3.4), Inches(0.15))
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = C_DARK_PURPLE
+    bar.line.fill.background()
+    
+    add_text(slide5, title, Inches(x+0.2), Inches(y_cards+0.3), Inches(3), Inches(0.7), 
+             font_size=20, color=C_DARK_PURPLE, bold=True)
+    
+    add_deco_line(slide5, Inches(x+0.4), Inches(y_cards+0.9), Inches(2.6), Inches(0.02), C_GRAY)
+    
+    add_text(slide5, desc, Inches(x+0.3), Inches(y_cards+1.1), Inches(2.8), Inches(2.2), 
+             font_size=18, color=C_BLACK, align=PP_ALIGN.LEFT)
+
+# ============================================================
+# 幻灯片6：内心的感悟
+# ============================================================
+slide6 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide6, RGBColor(255, 240, 210))
+
+add_deco_circle(slide6, Inches(11), Inches(-0.5), Inches(3.5), RGBColor(255, 210, 140))
+add_deco_circle(slide6, Inches(-1), Inches(5.5), Inches(2.8), RGBColor(255, 220, 160))
+add_deco_circle(slide6, Inches(6.5), Inches(7), Inches(1.5), RGBColor(255, 200, 120))
+
+add_text(slide6, "💭  04  内心的感悟", Inches(1), Inches(0.4), Inches(11), Inches(1.1), 
+         font_size=42, color=RGBColor(180, 100, 30), bold=True, align=PP_ALIGN.LEFT)
+add_deco_line(slide6, Inches(1), Inches(1.5), Inches(4.2), Inches(0.04), RGBColor(180, 100, 30))
+
+quote_bg = slide6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.5), Inches(1.8), Inches(10.3), Inches(4.2))
+quote_bg.fill.solid()
+quote_bg.fill.fore_color.rgb = C_WHITE
+quote_bg.line.color.rgb = RGBColor(200, 160, 80)
+quote_bg.line.width = Pt(2)
+
+add_deco_circle(slide6, Inches(1.8), Inches(2.0), Inches(0.3), RGBColor(200, 160, 80))
+add_deco_circle(slide6, Inches(11.5), Inches(5.6), Inches(0.3), RGBColor(200, 160, 80))
+
+quote_text = """“放学路上，不只是从学校到家的距离，
+
+更是一天中最放松、最真实的时光。
+
+我们在这里观察生活，感受温度，
+
+也在不知不觉中，长成了更好的自己。”"""
+
+add_text(slide6, quote_text, Inches(2.5), Inches(2.3), Inches(8.3), Inches(3.2), 
+         font_size=28, color=C_BLACK, align=PP_ALIGN.CENTER, italic=True)
+
+add_text(slide6, "—— 致那些闪闪发光的放学时光", Inches(2.5), Inches(5.2), Inches(8.3), Inches(0.6), 
+         font_size=20, color=RGBColor(150, 100, 50), align=PP_ALIGN.RIGHT, italic=True)
+
+# ============================================================
+# 幻灯片7：回家的路
+# ============================================================
+slide7 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide7, RGBColor(200, 225, 240))
+
+add_deco_circle(slide7, Inches(10.5), Inches(-0.8), Inches(4), RGBColor(160, 200, 220))
+add_deco_circle(slide7, Inches(-0.5), Inches(5.5), Inches(2.5), RGBColor(140, 190, 215))
+add_deco_circle(slide7, Inches(12), Inches(6), Inches(1.8), RGBColor(170, 210, 230))
+
+add_text(slide7, "🏠  05  回家的路", Inches(1), Inches(0.4), Inches(11), Inches(1.1), 
+         font_size=42, color=C_DARK_BLUE, bold=True, align=PP_ALIGN.LEFT)
+add_deco_line(slide7, Inches(1), Inches(1.5), Inches(4.2), Inches(0.04), C_DARK_BLUE)
+
+home_text = """🌆 天色渐暗，路灯亮起，
+
+✨ 家的灯光在远处温暖地闪烁。
+
+🍲 推开门，饭菜的香气扑面而来。
+
+😊 一天的疲惫，在这一刻烟消云散。"""
+
+add_text(slide7, home_text, Inches(1.5), Inches(2.0), Inches(6), Inches(3.5), 
+         font_size=26, color=C_BLACK, align=PP_ALIGN.LEFT)
+
+# 房子装饰 - 修复坐标问题
+house_x = 8.5
+house_y = 2.2
+
+house = slide7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(house_x), Inches(3.0), Inches(3.5), Inches(2.8))
+house.fill.solid()
+house.fill.fore_color.rgb = RGBColor(255, 210, 130)
+house.line.color.rgb = RGBColor(160, 110, 50)
+house.line.width = Pt(2)
+
+roof = slide7.shapes.add_shape(MSO_SHAPE.ISOSCELES_TRIANGLE, Inches(house_x - 0.3), Inches(2.0), Inches(4.1), Inches(1.8))
+roof.fill.solid()
+roof.fill.fore_color.rgb = RGBColor(180, 80, 40)
+roof.line.color.rgb = RGBColor(130, 60, 30)
+roof.line.width = Pt(2)
+
+chimney = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(house_x + 2.5), Inches(1.8), Inches(0.5), Inches(1.2))
+chimney.fill.solid()
+chimney.fill.fore_color.rgb = RGBColor(160, 100, 60)
+chimney.line.color.rgb = RGBColor(120, 70, 40)
+chimney.line.width = Pt(1)
+
+smoke1 = slide7.shapes.add_shape(MSO_SHAPE.OVAL, Inches(house_x + 2.6), Inches(1.3), Inches(0.3), Inches(0.3))
+smoke1.fill.solid()
+smoke1.fill.fore_color.rgb = RGBColor(200, 200, 200)
+smoke1.line.fill.background()
+
+smoke2 = slide7.shapes.add_shape(MSO_SHAPE.OVAL, Inches(house_x + 2.9), Inches(1.0), Inches(0.4), Inches(0.3))
+smoke2.fill.solid()
+smoke2.fill.fore_color.rgb = RGBColor(180, 180, 180)
+smoke2.line.fill.background()
+
+window = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(house_x + 1.0), Inches(3.6), Inches(0.9), Inches(0.8))
+window.fill.solid()
+window.fill.fore_color.rgb = RGBColor(255, 230, 150)
+window.line.color.rgb = RGBColor(100, 70, 30)
+window.line.width = Pt(1)
+
+window2 = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(house_x + 2.2), Inches(3.6), Inches(0.9), Inches(0.8))
+window2.fill.solid()
+window2.fill.fore_color.rgb = RGBColor(255, 230, 150)
+window2.line.color.rgb = RGBColor(100, 70, 30)
+window2.line.width = Pt(1)
+
+door = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(house_x + 1.5), Inches(4.6), Inches(0.7), Inches(1.2))
+door.fill.solid()
+door.fill.fore_color.rgb = RGBColor(140, 90, 50)
+door.line.color.rgb = RGBColor(100, 60, 30)
+door.line.width = Pt(1)
+
+handle = slide7.shapes.add_shape(MSO_SHAPE.OVAL, Inches(house_x + 2.0), Inches(5.2), Inches(0.12), Inches(0.12))
+handle.fill.solid()
+handle.fill.fore_color.rgb = RGBColor(200, 180, 50)
+handle.line.fill.background()
+
+path = slide7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(house_x + 0.8), Inches(5.8), Inches(1.8), Inches(0.3))
+path.fill.solid()
+path.fill.fore_color.rgb = RGBColor(180, 160, 130)
+path.line.fill.background()
+
+add_text(slide7, "🏡 温暖的家", Inches(8.8), Inches(6.2), Inches(2.8), Inches(0.5), 
+         font_size=18, color=C_DARK_BLUE, align=PP_ALIGN.CENTER, italic=True)
+
+# ============================================================
+# 幻灯片8：结束页
+# ============================================================
+slide8 = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide8, C_WARM)
+
+add_deco_circle(slide8, Inches(10.5), Inches(-0.8), Inches(4.5), RGBColor(255, 200, 130))
+add_deco_circle(slide8, Inches(-1), Inches(5.5), Inches(3.5), RGBColor(255, 215, 150))
+add_deco_circle(slide8, Inches(12), Inches(6), Inches(2), RGBColor(255, 190, 110))
+
+add_deco_line(slide8, Inches(0), Inches(0.3), prs.slide_width, Inches(0.03), C_DARK_ORANGE)
+add_deco_line(slide8, Inches(0), Inches(0.35), prs.slide_width, Inches(0.02), C_ORANGE)
+
+add_text(slide8, "✨ 谢谢观看 ✨", Inches(1.5), Inches(2.2), Inches(10), Inches(1.5), 
+         font_size=60, color=C_DARK_ORANGE, bold=True)
+
+add_text(slide8, "愿每一段放学路，都充满温暖与回忆", Inches(1.5), Inches(4.0), Inches(10), Inches(1), 
+         font_size=30, color=RGBColor(140, 80, 40), italic=True)
+
+for i in range(12):
+    x = Inches(0.5 + i * 1.1)
+    y = Inches(6.5)
+    size = Inches(0.06)
+    if i % 2 == 0:
+        add_deco_circle(slide8, x, y, size, C_DARK_ORANGE)
+    else:
+        add_deco_circle(slide8, x, y, size, C_ORANGE)
+
+add_text(slide8, "🏫  ❤️  🌳  ❤️  🏠", Inches(3.5), Inches(6.0), Inches(6), Inches(0.5), 
+         font_size=24, color=C_DARK_ORANGE)
+
+# ============================================================
+# 保存
+# ============================================================
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+file_path = os.path.join(desktop_path, "放学路上_精美版.pptx")
+prs.save(file_path)
+print(f"✅ 精美版PPT已生成！保存位置：{file_path}")
+print(f"📊 共 {len(prs.slides)} 页幻灯片")

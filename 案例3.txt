@@ -1,0 +1,298 @@
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+import os
+
+# ------------------ 创建演示文稿 ------------------
+prs = Presentation()
+prs.slide_width = Inches(13.333)
+prs.slide_height = Inches(7.5)
+
+# ------------------ 辅助函数 ------------------
+def add_background(slide, color):
+    """添加纯色背景"""
+    background = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height
+    )
+    background.fill.solid()
+    background.fill.fore_color.rgb = RGBColor(*color)
+    background.line.fill.background()
+    # 将背景置于底层
+    slide.shapes._spTree.insert(2, background._element)
+
+def add_gradient_shape(slide, left, top, width, height, color1, color2, transparency=0.0):
+    """添加渐变矩形（装饰用）"""
+    shape = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, height)
+    fill = shape.fill
+    fill.gradient()
+    fill.gradient_angle = 45.0
+    fill.gradient_stops[0].color.rgb = RGBColor(*color1)
+    fill.gradient_stops[0].position = 0.0
+    fill.gradient_stops[1].color.rgb = RGBColor(*color2)
+    fill.gradient_stops[1].position = 1.0
+    fill.transparency = transparency
+    shape.line.fill.background()
+    return shape
+
+def add_text_box(slide, text, left, top, width, height, font_size=18, font_color=(255,255,255), bold=False, align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.MIDDLE):
+    """添加文本框"""
+    txBox = slide.shapes.add_textbox(left, top, width, height)
+    tf = txBox.text_frame
+    tf.text = text
+    tf.word_wrap = True
+    tf.vertical_anchor = valign
+    p = tf.paragraphs[0]
+    p.alignment = align
+    p.font.size = Pt(font_size)
+    p.font.color.rgb = RGBColor(*font_color)
+    p.font.bold = bold
+    return txBox
+
+def add_title(slide, title, subtitle=None):
+    """添加标题样式 (顶部居中)"""
+    # 标题
+    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.3), Inches(12.33), Inches(1.2))
+    tf = title_box.text_frame
+    tf.text = title
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    p.font.size = Pt(44)
+    p.font.color.rgb = RGBColor(255, 255, 255)
+    p.font.bold = True
+    
+    # 副标题
+    if subtitle:
+        sub_box = slide.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(12.33), Inches(0.8))
+        tf = sub_box.text_frame
+        tf.text = subtitle
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        p.font.size = Pt(24)
+        p.font.color.rgb = RGBColor(220, 220, 220)
+
+def add_footer(slide, text="人工智能 · 科学前沿"):
+    """添加页脚"""
+    footer = slide.shapes.add_textbox(Inches(0.5), Inches(7.0), Inches(12.33), Inches(0.4))
+    tf = footer.text_frame
+    tf.text = text
+    tf.vertical_anchor = MSO_ANCHOR.BOTTOM
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    p.font.size = Pt(12)
+    p.font.color.rgb = RGBColor(180, 180, 180)
+
+# ------------------ 幻灯片 1: 封面 ------------------
+slide1 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide1, (10, 20, 40))  # 深蓝黑
+# 装饰渐变条
+add_gradient_shape(slide1, Inches(0), Inches(2.5), Inches(13.33), Inches(2.5), (30, 144, 255), (138, 43, 226), transparency=0.3)
+add_gradient_shape(slide1, Inches(0), Inches(4.0), Inches(13.33), Inches(0.8), (255, 215, 0), (255, 69, 0), transparency=0.2)
+
+# 主标题
+title_box = slide1.shapes.add_textbox(Inches(0.5), Inches(2.0), Inches(12.33), Inches(1.8))
+tf = title_box.text_frame
+tf.text = "人工智能发展"
+tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+p = tf.paragraphs[0]
+p.alignment = PP_ALIGN.CENTER
+p.font.size = Pt(66)
+p.font.color.rgb = RGBColor(255, 255, 255)
+p.font.bold = True
+
+sub_box = slide1.shapes.add_textbox(Inches(0.5), Inches(3.8), Inches(12.33), Inches(0.8))
+tf = sub_box.text_frame
+tf.text = "从科学幻想到重塑未来"
+tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+p = tf.paragraphs[0]
+p.alignment = PP_ALIGN.CENTER
+p.font.size = Pt(28)
+p.font.color.rgb = RGBColor(200, 200, 255)
+
+# 装饰线条
+line = slide1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(4.5), Inches(4.8), Inches(4.33), Inches(0.05))
+line.fill.solid()
+line.fill.fore_color.rgb = RGBColor(100, 149, 237)
+line.line.fill.background()
+
+# 作者信息
+info_box = slide1.shapes.add_textbox(Inches(0.5), Inches(5.8), Inches(12.33), Inches(0.6))
+tf = info_box.text_frame
+tf.text = "科学视角 · 2026"
+tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+p = tf.paragraphs[0]
+p.alignment = PP_ALIGN.CENTER
+p.font.size = Pt(20)
+p.font.color.rgb = RGBColor(180, 180, 210)
+
+add_footer(slide1, "人工智能 · 科学前沿")
+
+# ------------------ 幻灯片 2: 目录 ------------------
+slide2 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide2, (15, 15, 35))
+add_title(slide2, "内容框架", "探索AI的科学脉络")
+
+items = [
+    "01  人工智能的起源与定义",
+    "02  关键里程碑与技术突破",
+    "03  当前应用：科学领域的AI",
+    "04  伦理挑战与未来展望"
+]
+
+y_start = 2.8
+for i, item in enumerate(items):
+    y = y_start + i * 0.9
+    # 装饰小圆点
+    dot = slide2.shapes.add_shape(MSO_SHAPE.OVAL, Inches(1.5), Inches(y-0.1), Inches(0.3), Inches(0.3))
+    dot.fill.solid()
+    dot.fill.fore_color.rgb = RGBColor(70, 130, 255)
+    dot.line.fill.background()
+    # 文本
+    add_text_box(slide2, item, Inches(2.0), Inches(y), Inches(10), Inches(0.7), 
+                 font_size=28, font_color=(240, 240, 255), bold=True, align=PP_ALIGN.LEFT)
+
+add_footer(slide2)
+
+# ------------------ 幻灯片 3: 起源与定义 ------------------
+slide3 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide3, (20, 20, 45))
+add_title(slide3, "起源与定义", "从图灵测试到智能体")
+
+# 左侧文本
+text_left = """• 1950年，艾伦·图灵提出"图灵测试"
+   —— 机器能否思考？
+
+• 1956年达特茅斯会议正式提出
+   "人工智能"（AI）学科
+
+• 核心目标：模拟、延伸、扩展
+   人类智能的科学
+
+• 三大流派：符号主义、连接主义、
+   行为主义"""
+add_text_box(slide3, text_left, Inches(0.8), Inches(2.8), Inches(6), Inches(3.5), 
+             font_size=22, font_color=(220, 230, 255), align=PP_ALIGN.LEFT)
+
+# 右侧装饰框图
+shape = slide3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.5), Inches(2.5), Inches(4.0), Inches(3.2))
+shape.fill.solid()
+shape.fill.fore_color.rgb = RGBColor(30, 40, 70)
+shape.line.color.rgb = RGBColor(70, 130, 255)
+shape.line.width = Pt(2)
+# 内部文字
+inner_text = """科学本质：
+跨学科融合
+(计算机科学、神经科学、
+认知心理学、数学)"""
+add_text_box(slide3, inner_text, Inches(8.7), Inches(2.8), Inches(3.6), Inches(2.8), 
+             font_size=22, font_color=(200, 210, 255), align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
+
+add_footer(slide3)
+
+# ------------------ 幻灯片 4: 关键里程碑 ------------------
+slide4 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide4, (10, 25, 50))
+add_title(slide4, "关键里程碑", "技术突破重塑科学边界")
+
+timeline = [
+    ("1997", "深蓝击败卡斯帕罗夫", "符号主义巅峰"),
+    ("2012", "AlexNet 引爆深度学习", "感知革命"),
+    ("2016", "AlphaGo 战胜李世石", "强化学习突破"),
+    ("2020", "GPT-3 与大规模语言模型", "通用智能萌芽"),
+]
+
+x_start = 1.2
+for i, (year, event, desc) in enumerate(timeline):
+    x = x_start + i * 2.8
+    # 年份圆
+    circle = slide4.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(2.8), Inches(0.8), Inches(0.8))
+    circle.fill.solid()
+    circle.fill.fore_color.rgb = RGBColor(255, 215, 0)
+    circle.line.fill.background()
+    add_text_box(slide4, year, Inches(x), Inches(2.6), Inches(0.8), Inches(0.8), 
+                 font_size=18, font_color=(0,0,0), bold=True, align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
+    # 事件
+    add_text_box(slide4, event, Inches(x-0.2), Inches(3.8), Inches(1.2), Inches(0.8), 
+                 font_size=18, font_color=(255,255,255), bold=True, align=PP_ALIGN.CENTER)
+    add_text_box(slide4, desc, Inches(x-0.2), Inches(4.4), Inches(1.2), Inches(0.6), 
+                 font_size=14, font_color=(200,200,230), align=PP_ALIGN.CENTER)
+    # 连线（除最后一个）
+    if i < 3:
+        line = slide4.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x+0.8), Inches(3.1), Inches(2.0), Inches(0.05))
+        line.fill.solid()
+        line.fill.fore_color.rgb = RGBColor(100, 149, 237)
+        line.line.fill.background()
+
+add_footer(slide4)
+
+# ------------------ 幻灯片 5: 科学领域的AI应用 ------------------
+slide5 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide5, (25, 15, 45))
+add_title(slide5, "AI在科学领域的应用", "加速发现与创新")
+
+apps = [
+    ("药物研发", "AlphaFold 预测蛋白质结构"),
+    ("天文物理", "引力波探测与系外行星发现"),
+    ("气候科学", "极端天气预测与气候建模"),
+    ("材料科学", "新型超导材料AI筛选"),
+]
+
+y_start = 2.8
+for i, (title, desc) in enumerate(apps):
+    y = y_start + i * 1.0
+    # 卡片背景
+    card = slide5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.2), Inches(y-0.1), Inches(10.8), Inches(0.8))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(30, 40, 70)
+    card.line.color.rgb = RGBColor(70, 130, 255)
+    card.line.width = Pt(1)
+    # 标题
+    add_text_box(slide5, title, Inches(1.5), Inches(y), Inches(3), Inches(0.7), 
+                 font_size=24, font_color=(255,215,0), bold=True, align=PP_ALIGN.LEFT)
+    # 描述
+    add_text_box(slide5, desc, Inches(5.0), Inches(y), Inches(6.5), Inches(0.7), 
+                 font_size=22, font_color=(220,230,255), align=PP_ALIGN.LEFT)
+
+add_footer(slide5, "科学驱动 · AI赋能")
+
+# ------------------ 幻灯片 6: 伦理与未来 ------------------
+slide6 = prs.slides.add_slide(prs.slide_layouts[6])
+add_background(slide6, (10, 10, 30))
+add_title(slide6, "伦理挑战与未来展望", "科学引导AI向善")
+
+# 左侧：伦理
+add_text_box(slide6, "⚖️ 伦理挑战", Inches(1.0), Inches(2.8), Inches(5), Inches(0.8), 
+             font_size=28, font_color=(255, 200, 100), bold=True)
+ethics_text = """• 算法偏见与公平性
+• 隐私保护与数据安全
+• AI责任归属与透明度
+• 自主武器的伦理困境"""
+add_text_box(slide6, ethics_text, Inches(1.2), Inches(3.8), Inches(5), Inches(2.5), 
+             font_size=22, font_color=(210,220,255), align=PP_ALIGN.LEFT)
+
+# 右侧：未来
+add_text_box(slide6, "🚀 科学展望", Inches(7.2), Inches(2.8), Inches(5), Inches(0.8), 
+             font_size=28, font_color=(100, 200, 255), bold=True)
+future_text = """• 通用人工智能(AGI)探索
+• 脑机接口与神经科学融合
+• AI驱动的科学发现自动化
+• 人机协作新范式"""
+add_text_box(slide6, future_text, Inches(7.4), Inches(3.8), Inches(5), Inches(2.5), 
+             font_size=22, font_color=(210,220,255), align=PP_ALIGN.LEFT)
+
+# 底部装饰线
+line = slide6.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(1.0), Inches(6.2), Inches(11.33), Inches(0.05))
+line.fill.solid()
+line.fill.fore_color.rgb = RGBColor(70, 130, 255)
+line.line.fill.background()
+
+add_footer(slide6, "人工智能 · 科学向善")
+
+# ------------------ 保存文件 ------------------
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+file_path = os.path.join(desktop_path, "AI_Development_Science.pptx")
+prs.save(file_path)
+print(f"PPT已成功生成并保存至：{file_path}")
