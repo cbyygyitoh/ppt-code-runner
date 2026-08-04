@@ -3,6 +3,7 @@
 > 一款面向教育工作者的免费 PPT 辅助生成工具，无需编程基础，粘贴 AI 代码即可一键生成 PPT。
 
 针对传统PPT制作效率低下与市面AI生成工具收费过高的双重问题，本软件以完全免费、零门槛的方式，为教育工作者提供高效便捷的PPT生成解决方案。
+本工具专为以下人群设计：完全不懂编程、没有时间手动制作PPT、又不想为网上模板或AI工具生成PPT额外付费的教育工作者。旨在彻底降低PPT制作的使用门槛
 
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-PolyForm%20Noncommercial-red.svg)](LICENSE)
@@ -158,6 +159,8 @@ pyinstaller --onefile --noconsole --name "PPT代码运行器" PPT代码运行_�
 <img width="2560" height="1406" alt="image" src="https://github.com/user-attachments/assets/62bddad1-900f-4ad3-b9a3-b06412647a76" />
 
 <img width="2560" height="1104" alt="image" src="https://github.com/user-attachments/assets/ae60fb15-f76d-4813-8dc1-4d3b820d0864" />
+
+注：本软件仅提供一个代码运行环境，不参与PPT内容的生成。最终PPT的质量取决于所用大模型生成代码的水平
 
 
 ## 📄 许可证
