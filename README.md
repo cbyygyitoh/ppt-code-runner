@@ -48,6 +48,8 @@
 
 **推荐 AI 提示词模板：**
 
+详见[提示词模板](prompt必加.txt)或者如下可直接复制：
+
 ```text
 请帮我制作一份关于 [你的主题] 的 PPT，使用 python-pptx 库生成代码。
 要求：
@@ -159,6 +161,8 @@ pyinstaller --onefile --noconsole --name "PPT代码运行器" PPT代码运行_�
 <img width="2560" height="1406" alt="image" src="https://github.com/user-attachments/assets/62bddad1-900f-4ad3-b9a3-b06412647a76" />
 
 <img width="2560" height="1104" alt="image" src="https://github.com/user-attachments/assets/ae60fb15-f76d-4813-8dc1-4d3b820d0864" />
+
+示例ppt源码见：[案例1ppt生成代码](案例1.txt),[案例2ppt生成代码](案例2.txt),[案例3ppt生成代码](案例3.txt),[案例4ppt生成代码](案例4.txt)
 
 注：本软件仅提供一个代码运行环境，不参与PPT内容的生成。最终PPT的质量取决于所用大模型生成代码的水平
 
