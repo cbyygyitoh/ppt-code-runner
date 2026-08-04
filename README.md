@@ -151,7 +151,7 @@ python PPT代码运行_源码.py
 pyinstaller --onefile --noconsole --name "PPT代码运行器" PPT代码运行_源码.py
 ```
 
-##生成作品示例
+## 生成作品示例
 
 <img width="2560" height="1409" alt="image" src="https://github.com/user-attachments/assets/d2b42250-5eef-47f0-9bab-1da3d76fc23b" />
 
