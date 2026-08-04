@@ -29,7 +29,7 @@
 
 ### 下载与使用
 
-1. **下载**：从 [Releases](https://github.com/你的用户名/ppt-code-runner/releases) 下载最新版本
+1. **下载**：从 [Releases](https://github.com/cbyygyitoh/ppt-code-runner/releases) 下载最新版本
 2. **解压**：解压到任意文件夹
 3. **运行**：双击 `PPT代码运行器.exe`
 <img width="723" height="584" alt="image" src="https://github.com/user-attachments/assets/b70aec84-c1fe-449d-be58-f16d0ac9b348" />
