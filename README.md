@@ -43,7 +43,7 @@
 
 为保持稳定，建议基于下图的模板进行增加其他的要求
 
-<img width="865" height="293" alt="image" src="https://github.com/user-attachments/assets/fa45ba8b-89a8-4e30-a134-102703aa2797" />
+<img width="1638" height="626" alt="image" src="https://github.com/user-attachments/assets/7823ce18-3181-44a8-b319-38ea8835688d" />
 
 
 **推荐 AI 提示词模板：**
@@ -51,11 +51,13 @@
 详见[提示词模板](prompt必加.txt)或者如下可直接复制：
 
 ```text
-请帮我制作一份关于 [你的主题] 的 PPT，使用 python-pptx 库生成代码。
+请帮我制作一个关于"________"主题的PPT，使用python-pptx库生成代码。
 要求：
 1. 使用系统默认字体
-2. 保存在桌面
-3. 美化润色，极具吸引力
+2. 文件保存在桌面
+3. 代码最后必须用 print 输出文件完整路径，格式为：print(f"PPT已生成: {file_path}")
+4. 要有独特性，美化并润色，极具吸引力
+5. 请直接输出完整的代码
 
 [在这里补充你的其他要求，如：页数、配色、内容结构等]
 ```
